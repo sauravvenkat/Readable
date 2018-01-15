@@ -3,7 +3,6 @@ import * as Actions from '../actions'
 import { connect } from 'react-redux'
 import Comment from './Comment'
 import { Link } from 'react-router-dom'
-import axios from 'axios'
 
 class PostDetail extends Component{
 	state = {
@@ -13,16 +12,10 @@ class PostDetail extends Component{
 		author: this.props.author,
 		body: this.props.body,
 		title: this.props.title,
-		ROOT: 'http://localhost:3001'
 	}
 
 	componentDidMount(){
-		const ROOT = 'http://localhost:3001'
-		const AUTH_HEADERS = { 'Authorization': 'whatever-you-want', 'Accept': 'application/json', };
-    axios.defaults.headers.common['Authorization'] = AUTH_HEADERS;
-		axios.get(`${ROOT}/posts/${this.props.id}/comments`).then(res =>{
-			this.props.getComments(res.data)
-		})
+		this.props.fetchComments(this.props.id)
 
 	}
 
@@ -31,20 +24,17 @@ class PostDetail extends Component{
 					voteScore: prevState.voteScore += 1
 				}))
 
-		axios.post(`${this.state.ROOT}/posts/${this.props.id}`, {option: 'upVote'})
+		this.props.votePost('upVote', this.props.id)
 	}
 	handleDownVote(){
 		this.setState((prevState) => ({
 					voteScore: prevState.voteScore -= 1
 				}))
-		axios.post(`${this.state.ROOT}/posts/${this.props.id}`, {option: 'downVote'})
+		this.props.votePost('downVote', this.props.id)
 	}
 	handleDelete(){			
-		axios.delete(`${this.state.ROOT}/posts/${this.props.id}`).then(res => console.log(res.statusText))
 		
-		this.props.getPosts(this.props.posts.filter((post) => {
-			return post.id !== this.props.id
-		}))
+		this.props.deletePost(this.props.id)
 	}
 
 
@@ -59,8 +49,7 @@ class PostDetail extends Component{
 						const data = new FormData(event.target)
 						this.setState({title: data.get('title'), body: data.get('body')})
 						this.setState({edit: false})
-						axios.put(`${this.state.ROOT}/posts/${this.props.id}`,{title: data.get('title'), body: data.get('body')})
-						axios.get(`${this.state.ROOT}/posts`).then(res => this.props.getPosts(res.data))
+						this.props.editPost(this.props.id, {title: data.get('title'), body: data.get('body')})
 					}}>
 						Title: <input type='text' name='title' defaultValue={this.props.title}/>
 						Body: <input type='text' name='body' defaultValue={this.props.body} />
@@ -79,10 +68,8 @@ class PostDetail extends Component{
 				</div>
 				<form className='CommentForm' onSubmit={(event) => {
 					event.preventDefault()
-					const ROOT = 'http://localhost:3001'
 					const data = new FormData(event.target)
-					axios.post(`${ROOT}/comments`,{id: Date.now.toString(), author: data.get('author'),parentId: this.props.id, body: data.get('body'), timestamp: Date.now()})
-					this.props.addComment({id: Date.now().toString(), author: data.get('author'),parentId: this.props.id, body: data.get('body'), deleted: false, parentDeleted: false, timestamp: Date.now(), voteScore: 0})
+					this.props.addComment({id: Date.now().toString(), author: data.get('author'),parentId: this.props.id, body: data.get('body'), deleted: false, parentDeleted: false, timestamp: Date.now(), voteScore: 0}, Date.now.toString())
 					document.getElementById('CommentAuthor').value = ''
 					document.getElementById('CommentBody').value = ''
 				}}>
@@ -122,9 +109,7 @@ class PostDetail extends Component{
 				</div>
 				<form className='CommentForm' onSubmit={(event) => {
 					event.preventDefault()
-					const ROOT = 'http://localhost:3001'
 					const data = new FormData(event.target)
-					axios.post(`${ROOT}/comments`,{id: Date.now.toString(), author: data.get('author'),parentId: this.props.id, body: data.get('body'), timestamp: Date.now()})
 					this.props.addComment({id: Date.now().toString(), author: data.get('author'),parentId: this.props.id, body: data.get('body'), deleted: false, parentDeleted: false, timestamp: Date.now(), voteScore: 0})
 					document.getElementById('CommentAuthor').value = ''
 					document.getElementById('CommentBody').value = ''
@@ -149,9 +134,13 @@ function mapStateToProps(state){
 }
 function mapDispatchToProps(dispatch){
 	return{
-		getPosts: (posts) => {dispatch(Actions.receivePosts(posts))},
-		getComments: (comments) => {dispatch(Actions.receiveComments(comments))},
-		addComment: (comment) => { dispatch(Actions.addComment(comment))},
+		getPosts: (posts) => {dispatch(Actions.fetchPosts())},
+		fetchComments: (id) => {dispatch(Actions.fetchComments(id))},
+		addComment: (comment, id) => { dispatch(Actions.addAsyncComment(comment, id))},
+		fetchPosts: () => { dispatch(Actions.fetchPosts())},
+		deletePost: (id) => {dispatch(Actions.deleteAsyncPost(id))},
+		votePost: (option, id) => { dispatch(Actions.votePost(option, id))},
+		editPost: (id, edit) => { dispatch(Actions.editPost(id, edit))}
 	}
 }
 export default connect(mapStateToProps, mapDispatchToProps)(PostDetail)

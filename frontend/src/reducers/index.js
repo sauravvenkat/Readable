@@ -40,6 +40,9 @@ function posts(state = {'posts': []}, action){
     case RECEIVE_POSTS:
       const { posts } = action
       return { 'posts': [...posts]}
+    case 'DELETE_POST':
+      const { id } = action
+      return{ 'posts': [...state['posts'].filter((post) => post.id !== id)]}
     default:
       return {
         ...state
@@ -55,6 +58,9 @@ function comments(state={'comments': []}, action){
     case ADD_COMMENT:
       const { comment } = action
       return { 'comments': [...state['comments'], comment]}
+    case 'DELETE_COMMENT':
+      const { id } = action
+      return { 'comments': [...state['comments'].filter((comment) => comment.id !== id)]}
     default:
       return{
         ...state

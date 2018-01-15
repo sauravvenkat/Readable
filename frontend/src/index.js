@@ -4,13 +4,14 @@ import './index.css';
 import App from './components/App';
 import registerServiceWorker from './registerServiceWorker';
 // import * as API from './utils/api'
-import { createStore } from 'redux';
+import thunk from 'redux-thunk'
+import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux'
 import { rootReducer } from './reducers'
 import { BrowserRouter } from 'react-router-dom';
 
 
-export const store = createStore(rootReducer);
+export const store = createStore(rootReducer, applyMiddleware(thunk));
 
 
 

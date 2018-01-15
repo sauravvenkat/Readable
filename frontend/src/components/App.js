@@ -6,21 +6,15 @@ import * as Actions from '../actions'
 import { Route, withRouter } from 'react-router-dom'
 import PostDetail from './PostDetail'
 import PostCategory from './PostCategory'
-import axios from 'axios'
 import NotFound from './NotFound'
 
 
 
 class App extends Component { 
 	componentDidMount(){
-    const ROOT = 'http://localhost:3001'
-    const AUTH_HEADERS = { 'Authorization': 'whatever-you-want', 'Accept': 'application/json', };
-    axios.defaults.headers.common['Authorization'] = AUTH_HEADERS;
-    axios.get(`${ROOT}/categories`).then(res => this.props.getCats(res.data.categories))
-    // axios.post(`${ROOT}/posts`,{id: Date.now().toString(), timestamp: Date.now(), title: 'React is awesome', body: 'React is awesomer', author:'me', category: 'react'})
-    axios.get(`${ROOT}/posts`).then(res => this.props.getPosts(res.data))
-    // axios.delete(`${ROOT}/posts/1515805428716`)
-    axios.get(`${ROOT}/posts`).then(res => this.props.getPosts(res.data))
+    this.props.fetchPosts()
+    this.props.fetchCats()
+
 
 	}
 
@@ -62,8 +56,9 @@ function mapStateToProps(state){
 
 function mapDispatchToProps(dispatch){
 	return {
+    fetchPosts: () => { dispatch(Actions.fetchPosts())},
 		getPosts: (posts) =>  { dispatch(Actions.receivePosts(posts)) },
-		getCats: (cats) => { dispatch(Actions.receiveCategories(cats))}
+    fetchCats: () => {dispatch(Actions.fetchCategories())}
 	}
 }
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App));

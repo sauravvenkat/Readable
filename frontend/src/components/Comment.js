@@ -29,7 +29,7 @@ class Comment extends Component{
 		axios.post(`${this.state.ROOT}/comments/${this.props.id}`,{option: 'downVote'})
 	}
 	handleDelete(event){
-		axios.delete(`${this.state.ROOT}/comments/${this.props.id}`)
+		this.props.deleteComment(this.props.id)
 		axios.get(`${this.state.ROOT}/posts/${this.props.parentId}/comments`).then(res => this.props.getComments(res.data.filter((comment) => {
 			return comment.deleted === false
 		})))
@@ -84,7 +84,8 @@ function mapStateToProps(state){
 }
 function mapDispatchToProps(dispatch){
 	return{
-		getComments: (comments) => { dispatch(Actions.receiveComments(comments))}
+		getComments: (comments) => { dispatch(Actions.receiveComments(comments))},
+		deleteComment: (id) => {dispatch(Actions.deleteAsyncComment(id))}
 	}
 }
 export default connect(mapStateToProps, mapDispatchToProps)(Comment)

@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import Post from './Post'
 import * as Actions from '../actions'
 import { Link } from 'react-router-dom'
-import axios from 'axios'
 
 
 class PostCategory extends Component{
@@ -69,12 +68,10 @@ class PostCategory extends Component{
 			})
 		}
 			<form className='PostForm' onSubmit={(event) => {
-				const ROOT = 'http://localhost:3001'
 				event.preventDefault()
 				const data = new FormData(event.target)
-				axios.post(`${ROOT}/posts`,{id: Date.now().toString(), title: data.get('title'), author: data.get('author'), body: data.get('body'), category: data.get('category'),timestamp: Date.now()})
-					this.props.addPost({id: Date.now().toString(), title: data.get('title'), author: data.get('author'), body: data.get('body'), category: data.get('category'), commentCount: 0, deleted: false, voteScore: 0, timestamp: Date.now()})
-					const ids = ['PostTitle', 'PostAuthor', 'PostCategory', 'PostBody']
+					this.props.addPost({id: Date.now().toString(), title: data.get('title'), author: data.get('author'), body: data.get('body'), category: this.props.category, commentCount: 0, deleted: false, voteScore: 0, timestamp: Date.now()})
+					const ids = ['PostTitle', 'PostAuthor', 'PostBody']
 					ids.forEach((id) => {
 						document.getElementById(id).value = ''
 					})
@@ -82,7 +79,6 @@ class PostCategory extends Component{
 			}}>
 				<input placeholder='Title' id='PostTitle' name='title' type='text' />
 				<input placeholder='Author' id='PostAuthor' name='author' type='text' />
-				<input placeholder='Category' id='PostCategory' name='category' type='text'/>
 				<input className='PostBody'  id='PostBody' name='body' placeholder='Body...' type='text' />
 				<button type='submit'>Add Post</button> 
 			</form>
@@ -100,7 +96,7 @@ function mapStateToProps(state){
 
 function mapDispatchToProps(dispatch){
 	return{
-		addPost: (post) => { dispatch(Actions.addPost(post))},
+		addPost: (post) => { dispatch(Actions.addAsyncPost(post))},
 	}
 }
 

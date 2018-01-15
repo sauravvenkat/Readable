@@ -3,14 +3,10 @@ import Post from './Post'
 import { connect } from 'react-redux'
 import * as Actions from '../actions'
 import { Link } from 'react-router-dom'
-import axios from 'axios'
 
 class PostsRoot extends Component{
 		componentDidMount(){
-			const ROOT = 'http://localhost:3001'
-		const AUTH_HEADERS = { 'Authorization': 'whatever-you-want', 'Accept': 'application/json', };
-    axios.defaults.headers.common['Authorization'] = AUTH_HEADERS;
-			axios.get(`${ROOT}/posts`).then(res => this.props.getPosts(res.data))
+			this.props.fetchPosts()
 		}
 
 		state = {
@@ -75,22 +71,15 @@ class PostsRoot extends Component{
 
 			}
 			<form className='PostForm' onSubmit={(event) => {
-				const ROOT = 'http://localhost:3001'
 				event.preventDefault()
 				const data = new FormData(event.target)
-				try{
-					axios.post(`${ROOT}/posts`,{id: Date.now().toString(), title: data.get('title'), author: data.get('author'), body: data.get('body'), category: data.get('category'),timestamp: Date.now()})
-					this.props.addPost({id: Date.now().toString(), title: data.get('title'), author: data.get('author'), body: data.get('body'), category: data.get('category'), commentCount: 0, deleted: false, voteScore: 0, timestamp: Date.now()})
-					const ids = ['PostTitle', 'PostAuthor', 'PostCategory', 'PostBody']
-					ids.forEach((id) => {
-						document.getElementById(id).value = ''
-					})
+				this.props.addPost({id: Date.now().toString(), title: data.get('title'), author: data.get('author'), body: data.get('body'), category: data.get('category'), commentCount: 0, deleted: false, voteScore: 0, timestamp: Date.now()})
+				const ids = ['PostTitle', 'PostAuthor', 'PostCategory', 'PostBody']
+				ids.forEach((id) => {
+					document.getElementById(id).value = ''
+				})
 
 
-				}
-				catch(err){
-					console.log(err)
-				}
 			}}>
 				<input placeholder='Title' id='PostTitle' name='title' type='text' />
 				<input placeholder='Author' id='PostAuthor' name='author' type='text' />
@@ -114,8 +103,9 @@ function mapDispatchToProps(dispatch){
 	return {
 		getPosts: (posts) =>  { dispatch(Actions.receivePosts(posts)) },
 		getCats: (cats) => { dispatch(Actions.receiveCategories(cats))},
-		addPost: (post) => { dispatch(Actions.addPost(post))},
-		addCategory: (cat) => { dispatch(Actions.addCategory(cat))}
+		addPost: (post) => { dispatch(Actions.addAsyncPost(post))},
+		addCategory: (cat) => { dispatch(Actions.addCategory(cat))},
+		fetchPosts: () => { dispatch(Actions.fetchPosts())},
 	}
 }
 

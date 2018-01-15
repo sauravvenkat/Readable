@@ -4,6 +4,10 @@ import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import axios from 'axios'
 class Post extends Component {
+	componentDidMount(){
+		const AUTH_HEADERS = { 'Authorization': 'whatever-you-want', 'Accept': 'application/json', };
+    axios.defaults.headers.common['Authorization'] = AUTH_HEADERS;
+	}
 	state = {
 		voteScore: this.props.voteScore,
 		edit: false,
@@ -19,21 +23,18 @@ class Post extends Component {
 					voteScore: prevState.voteScore += 1
 				}))
 
-		axios.post(`${this.state.ROOT}/posts/${this.props.id}`, {option: 'upVote'})
+		// axios.post(`${this.state.ROOT}/posts/${this.props.id}`, {option: 'upVote'})
+		this.props.votePost('upVote', this.props.id)
 	}
 	handleDownVote(){
 		this.setState((prevState) => ({
 					voteScore: prevState.voteScore -= 1
 				}))
-		axios.post(`${this.state.ROOT}/posts/${this.props.id}`, {option: 'downVote'})
+		this.props.votePost('downVote', this.props.id)
 	}
-	handleDelete(){			
-		axios.delete(`${this.state.ROOT}/posts/${this.props.id}`).then(res => console.log(res.statusText))
-		
-		// this.props.addBrokenLink(this.props.category, this.props.id)
-		this.props.getPosts(this.props.posts.filter((post) => {
-			return post.id !== this.props.id
-		}))
+	handleDelete(){
+		this.props.deletePost(this.props.id)			
+		this.props.fetchPosts()
 	}
 	render(){
 		if(this.state.edit){
@@ -43,7 +44,7 @@ class Post extends Component {
 				this.setState({title: data.get('title'), body: data.get('body')})
 				this.setState({edit: false})
 				axios.put(`${this.state.ROOT}/posts/${this.props.id}`,{title: data.get('title'), body: data.get('body')})
-				axios.get(`${this.state.ROOT}/posts`).then(res => this.props.getPosts(res.data))
+				this.props.fetchPosts()
 			}}>
 				Title: <input type='text' name='title' defaultValue={this.props.title}/>
 				Body: <input type='text' name='body' defaultValue={this.props.body} />
@@ -81,6 +82,9 @@ function mapStateToProps(state){
 function mapDispatchToProps(dispatch){
 	return{
 		getPosts: (posts) => {dispatch(Actions.receivePosts(posts))},
+		fetchPosts: () => { dispatch(Actions.fetchPosts())},
+		deletePost: (id) => {dispatch(Actions.deleteAsyncPost(id))},
+		votePost: (option, id) => { dispatch(Actions.votePost(option, id))}
 	}
 }
 
