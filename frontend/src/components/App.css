@@ -1,0 +1,107 @@
+.App {
+  text-align: left;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+.App-header {
+  background-color: #222;
+  height: 150px;
+  padding: 20px;
+  color: white;
+}
+.MainLink{
+  position: relative;
+  left: 90%;
+}
+
+.App-title {
+  font-size: 1.5em;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+
+.post{
+  align-content: left;
+  padding: 2%;
+  margin: 2%;
+  border: 2px solid grey;
+}
+.PostForm{
+  display: flex;
+  flex-direction: column;
+  width: 20%;
+  margin: 2%;
+
+}
+.PostBody{
+  height: 200px;
+  width: 300px;
+  margin: 2%;
+
+}
+.PostEdit{
+  display: flex;
+  flex-direction: column;
+  width: 20%;
+  margin: 2%;
+  border: 2px solid grey;
+}
+.PostDetail{
+  margin: 2%;
+
+}
+.commentView{
+  border: 2px solid grey;
+  margin: 2%;
+}
+#updateComment{
+  width: 50%;
+  border: 2px solid grey;
+  margin: 3%;
+}
+.comment{
+  border: 1px solid grey;
+  font-size: 12px;
+}
+.CommentEdit{
+  display: flex;
+  flex-direction: column;
+  width: 20%;
+  margin: 2%;
+  border: 2px solid grey;
+}
+.SortFilter{
+  display: flex;
+  flex-direction: row;
+
+}
+.SortFilter div{
+  width: 100%;
+}
+
+.selectCategory{
+  margin: 1%;
+}
+.filterLabel{
+  margin-left: 2%;
+}
+.CatLink{
+  margin: 1%;
+}
+.CommentForm{
+  display: flex;
+  flex-direction: column;
+  width: 20%;
+  margin: 2%
+}
+.CommentBody{
+  height: 200px;
+
+}
