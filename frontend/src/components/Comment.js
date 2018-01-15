@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import * as Actions from '../actions'
 import { connect } from 'react-redux'
-import axios from 'axios'
 
 class Comment extends Component{
 	componentDidMount(){
@@ -12,27 +11,23 @@ class Comment extends Component{
 		edit: false,
 		author: this.props.author,
 		body: this.props.body,
-		ROOT: 'http://localhost:3001'
 
 	}
 	handleUpVote(){
 		this.setState((prevState) => ({
 					voteScore: prevState.voteScore += 1
 				}))
-		axios.post(`${this.state.ROOT}/comments/${this.props.id}`,{option: 'upVote'})
+		this.props.voteComment('upVote', this.props.id, this.props.parentId)
 
 	}
 	handleDownVote(){
 		this.setState((prevState) => ({
 					voteScore: prevState.voteScore -= 1
 				}))
-		axios.post(`${this.state.ROOT}/comments/${this.props.id}`,{option: 'downVote'})
+		this.props.voteComment('downVote', this.props.id, this.props.parentId)
 	}
 	handleDelete(event){
 		this.props.deleteComment(this.props.id)
-		axios.get(`${this.state.ROOT}/posts/${this.props.parentId}/comments`).then(res => this.props.getComments(res.data.filter((comment) => {
-			return comment.deleted === false
-		})))
 	}
 	handleEdit(){
 		this.setState({edit: true})
@@ -45,10 +40,7 @@ class Comment extends Component{
 					event.preventDefault()
 					const data = new FormData(event.target)
 					this.setState({edit: false, body: data.get('body')})
-					axios.put(`${this.state.ROOT}/comments/${this.props.id}`,{body: data.get('body'),timestamp: Date.now()})
-					axios.get(`${this.state.ROOT}/posts/${this.props.parentId}/comments`).then(res => this.props.getComments(res.data.filter((comment) => {
-			return comment.deleted === false
-		})))
+					this.props.editComment(this.props.id, {body: data.get('body'),timestamp: Date.now()}, this.props.parentId)
 
 				}}>
 					Body <input type='text' name='body' defaultValue={this.props.body} />
@@ -84,8 +76,10 @@ function mapStateToProps(state){
 }
 function mapDispatchToProps(dispatch){
 	return{
-		getComments: (comments) => { dispatch(Actions.receiveComments(comments))},
-		deleteComment: (id) => {dispatch(Actions.deleteAsyncComment(id))}
+		getComments: (id) => { dispatch(Actions.fetchComments(id))},
+		deleteComment: (id) => {dispatch(Actions.deleteAsyncComment(id))},
+		voteComment: (option, id, parent_id) => {dispatch(Actions.voteComment(option, id, parent_id))},
+		editComment: (id, edit, parentId) => {dispatch(Actions.editComment(id, edit, parentId))}
 	}
 }
 export default connect(mapStateToProps, mapDispatchToProps)(Comment)

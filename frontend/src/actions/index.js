@@ -1,5 +1,3 @@
-// import * as API from '../utils/api';
-// import { store } from '../index.js'
 import axios from 'axios'
 
 export const RECEIVE_POSTS = 'RECEIVE_POSTS'
@@ -26,6 +24,12 @@ export function fetchPosts(){
 export function editPost(id, edit){
 	return dispatch =>{
 		axios.put(`${ROOT}/posts/${id}`,edit).then(res => dispatch(fetchPosts()))
+	}
+}
+export function editComment(id, edit, parentId){
+	return dispatch => {
+		axios.put(`${ROOT}/comments/${id}`, edit).then(res => dispatch(fetchComments(parentId)))
+
 	}
 }
 
@@ -58,6 +62,12 @@ export function votePost(option, id){
 		axios.post(`${ROOT}/posts/${id}`, {'option': option }).then(res => dispatch(fetchPosts()))
 	}
 
+}
+
+export function voteComment(option, id, parent_id){
+	return dispatch => {
+		axios.post(`${ROOT}/comments/${id}`,{'option': option}).then(res => dispatch(fetchComments(parent_id)))
+	}
 }
 
 export function fetchCategories(){
